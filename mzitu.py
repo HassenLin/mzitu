@@ -15,10 +15,26 @@ Hostreferer = {
 
 ids = []
 autoAgree = False
+
+dirname, filename = os.path.split(os.path.abspath(__file__))
+savefile=dirname+"/ids"
+if os.path.isfile("ids"):
+   exist = input("發現存檔，是否繼續?")
+   if exist[0] != 'Y':
+       with open(savefile, 'r') as f:           
+           ids=f.readline().split()
+           autoAgree = True
+
+
 if len(sys.argv) == 1:
-    ids = input('請輸入ID：').split()
+    if not autoAgree:
+        ids.extend(input('請輸入ID：').split())
 else:
-    ids = sys.argv[1:]
+    ids.extend(sys.argv[1:])
+with open(savefile, 'w') as f:
+    for id in ids:
+        f.write(id+" ")
+
 download_num = 0
 def download(url,filename,i):
     global download_num 
@@ -41,7 +57,7 @@ def download(url,filename,i):
                 print('['+str(i), end="] ", flush = True)
         except (KeyboardInterrupt, SystemExit):
             input("\nInterrupted "+ str(i))                            
-            break
+            exit()
         except:
             print("\nGet " + str(i) + " error, retry...")
     download_num = download_num - 1
@@ -92,5 +108,6 @@ for id in ids:
         time.sleep(1)                
     print("")
     print("============================")
+os.remove(savefile)
 input("Press Enter to continue...")
 exit()
